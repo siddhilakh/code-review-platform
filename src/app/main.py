@@ -1,7 +1,9 @@
 from fastapi import FastAPI
+from src.app.api.routes import repositories, jobs
 
 app = FastAPI(title="Code Review & Repository Analysis Platform")
-
+app.include_router(repositories.router)
+app.include_router(jobs.router)
 
 @app.get("/health")
 def health():
