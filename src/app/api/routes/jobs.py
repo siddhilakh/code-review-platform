@@ -1,12 +1,14 @@
-from fastapi import APIRouter
-from src.app.core.store import jobs
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from src.app.core.database import get_db
+from src.app import models, schemas
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
 
-@router.get("/{job_id}")
-def get_job_status(job_id: str):
-    job = jobs.get(job_id)
+@router.get("/{job_id}", response_model=schemas.JobOut)
+def get_job_status(job_id: str, db: Session = Depends(get_db)):
+    job = db.query(models.Job).filter(models.Job.id == job_id).first()
     if job is None:
-        return {"error": "not found"}
+        raise HTTPException(status_code=404, detail="Job not found")
     return job
